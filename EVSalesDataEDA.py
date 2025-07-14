@@ -72,3 +72,49 @@ plt.suptitle('Share of New Cars that are EV Over Time (2010-2023)')
 plt.tight_layout(rect=[0, 0, 1, 0.95])
 plt.savefig('ev_sales_share_combined.png')
 plt.show()
+
+# Graph 2: Linechart of Share of new cars sold that are electric 2023
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# Define regions of interest
+regions_of_interest = ['World', 'Norway', 'United Kingdom', 'EU27', 'China', 'USA',
+                       'Germany', 'South Africa', 'India', 'Sweden']
+
+# Filter data for BEVs and PHEVs in the specified regions and years
+historical_filtered = historical_data[
+    (historical_data['region'].isin(regions_of_interest)) &
+    (historical_data['powertrain'].isin(['BEV', 'PHEV'])) &
+    (historical_data['year'].between(2010, 2023))
+]
+
+projected_filtered = projected_data[
+    (projected_data['region'].isin(regions_of_interest)) &
+    (projected_data['powertrain'].isin(['BEV', 'PHEV'])) &
+    (projected_data['year'].between(2010, 2023))
+]
+
+# Combine datasets
+combined_data = pd.concat([historical_filtered, projected_filtered])
+
+# Aggregate sales by year and region
+aggregated_data = combined_data.groupby(['year', 'region'])['value'].sum().reset_index()
+
+# Create subplots
+fig, axes = plt.subplots(nrows=5, ncols=2, figsize=(15, 20), sharex=True, sharey=True)
+axes = axes.flatten()  # Flatten axes array for iteration
+
+# Plot data for each region
+for idx, region in enumerate(regions_of_interest):
+    ax = axes[idx]
+    region_data = aggregated_data[aggregated_data['region'] == region]
+    ax.plot(region_data['year'], region_data['value'], marker='o', label=region, color='tab:blue')
+    ax.set_title(region, fontsize=12)
+    ax.grid(True)
+    ax.set_xlabel('Year')
+    ax.set_ylabel('Sales (Units)')
+
+# Adjust layout
+#plt.tight_layout()
+plt.suptitle('Share of new cars sold that are electric from 2010 to 2023', fontsize=16, y=1.02)
+plt.show()
