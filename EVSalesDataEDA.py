@@ -118,3 +118,17 @@ for idx, region in enumerate(regions_of_interest):
 #plt.tight_layout()
 plt.suptitle('Share of new cars sold that are electric from 2010 to 2023', fontsize=16, y=1.02)
 plt.show()
+
+# Graph 3: Line graph  Share of new electric cars that are fully battery-electric, 2012 to 2023 (Nurzahan)
+import seaborn as sns
+import pandas as pd
+
+historical_data = pd.read_csv('C:/Users/momas/Documents/EDAPractice/IEA-EV-dataEV salesHistoricalCars.csv')
+
+countries = ['Norway', 'United Kingdom', 'World', 'China', 'Sweden']
+
+filtered_historical_data = historical_data[
+    (historical_data['region'].isin(countries))]
+
+sns.lineplot(data=filtered_historical_data, x='year', y='value', hue = 'region', marker='o')
+plt.show()
