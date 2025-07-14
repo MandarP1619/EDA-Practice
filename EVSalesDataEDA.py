@@ -119,7 +119,7 @@ for idx, region in enumerate(regions_of_interest):
 plt.suptitle('Share of new cars sold that are electric from 2010 to 2023', fontsize=16, y=1.02)
 plt.show()
 
-# Graph 3: Line graph  Share of new electric cars that are fully battery-electric, 2012 to 2023 (Nurzahan)
+# Graph 3: Line graph  Share of new electric cars that are fully battery-electric, 2012 to 2023
 import seaborn as sns
 import pandas as pd
 
@@ -131,4 +131,48 @@ filtered_historical_data = historical_data[
     (historical_data['region'].isin(countries))]
 
 sns.lineplot(data=filtered_historical_data, x='year', y='value', hue = 'region', marker='o')
+plt.show()
+
+# Graph 5: geo graph Number of new electric cars sold, 2023 (Mandar)
+import pandas as pd
+import geopandas as gpd
+import matplotlib.pyplot as plt
+
+
+# Now read the shapefile, it should be in the directory
+world = gpd.read_file('C:/Users/nomas/Documents/EDAPractice/ne_10m_admin_0_countries.shp')
+
+# Filter the data for the year 2023 and for new electric car sales
+ev_sales_2023 = historical_data[(historical_data['year'] == 2023) & (historical_data['parameter'] == 'EV sales')]
+
+# Group by region and sum the sales
+ev_sales_2023_grouped = ev_sales_2023.groupby('region')['value'].sum().reset_index()
+
+# Manually create a mapping for regions that do not match
+region_mapping = {
+    'United States': 'United States of America',
+    'South Korea': 'Korea, Republic of',
+    'Russia': 'Russian Federation',
+    'Iran': 'Iran, Islamic Republic of',
+    'Syria': 'Syrian Arab Republic',
+    'Venezuela': 'Venezuela, Bolivarian Republic of',
+    'Bolivia': 'Bolivia, Plurinational State of',
+    'Tanzania': 'Tanzania, United Republic of',
+    'Vietnam': 'Viet Nam',
+    'Laos': "Lao People's Democratic Republic",
+    'Brunei': 'Brunei Darussalam'
+}
+
+# Apply the mapping to the EV sales data
+ev_sales_2023_grouped['region'] = ev_sales_2023_grouped['region'].replace(region_mapping)
+
+# Merge the world map with the EV sales data
+world_ev_sales = world.merge(ev_sales_2023_grouped, how='left', left_on='name', right_on='region')
+
+# Plot the world map with EV sales data
+fig, ax = plt.subplots(1, 1, figsize=(15, 10))
+world_ev_sales.plot(column='value', ax=ax, legend=True,
+                    legend_kwds={'label': "Number of New Electric Cars Sold in 2023",
+                                 'orientation': "horizontal"})
+plt.title('Distribution of New Electric Car Sales in 2023')
 plt.show()
